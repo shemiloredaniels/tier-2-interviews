@@ -27,12 +27,13 @@
   #lb-hint { padding: 6px 14px 4px; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; color: #bbb; text-transform: uppercase; flex-shrink: 0; }
   #list { overflow-y: auto; flex: 1; }
 
+  .region-header { padding: 10px 14px 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 800; letter-spacing: 0.12em; color: #999; text-transform: uppercase; background: #f5f5f5; border-bottom: 1px solid #d8d8d8; }
   .county-row { display: flex; align-items: center; gap: 8px; padding: 7px 14px; cursor: pointer; border-bottom: 1px solid #d8d8d8; transition: background 0.1s; user-select: none; }
   .county-row:hover { background: #e0e0de; }
   .county-row.active { background: #fff; border-left: 3px solid #C8102E; padding-left: 11px; }
   .county-row.dragging { opacity: 0.4; }
   .county-row[draggable="true"] { cursor: grab; }
-  .county-name { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.05em; color: #1a1a1a; flex: 1; text-transform: uppercase; }
+  .county-name { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.05em; color: #1a1a1a; flex: 1; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
   #detail { flex: 1; display: flex; flex-direction: column; background: #fff; min-width: 0; overflow: hidden; }
   #parcom-view { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
@@ -2227,7 +2228,28 @@ let dragIdx = null;
 function renderList() {
   const list = document.getElementById('list');
   list.innerHTML = '';
+  
+  // Define regions
+  const HTC_COUNTIES = ['Alachua', 'Brevard', 'Citrus', 'DeSoto', 'Flagler', 'Hardee', 'Hernando', 'Highlands', 'Hillsborough', 'Lake', 'Levy', 'Manatee', 'Marion', 'Orange', 'Osceola', 'Pasco', 'Pinellas', 'Polk', 'Putnam', 'Sarasota', 'Seminole', 'Sumter', 'Volusia'];
+  const PANHANDLE_COUNTIES = ['Bay', 'Calhoun', 'Escambia', 'Franklin', 'Gadsden', 'Gulf', 'Holmes', 'Jackson', 'Jefferson', 'Leon', 'Liberty', 'Okaloosa', 'Santa Rosa', 'Wakulla', 'Walton', 'Washington'];
+  
+  let lastRegion = null;
+  
   COUNTIES.forEach((c, idx) => {
+    // Determine current region
+    let currentRegion = null;
+    if (HTC_COUNTIES.includes(c.name)) currentRegion = 'HTC';
+    else if (PANHANDLE_COUNTIES.includes(c.name)) currentRegion = 'PANHANDLE';
+    
+    // Add region header if region changes
+    if (currentRegion !== lastRegion && currentRegion !== null) {
+      const header = document.createElement('div');
+      header.className = 'region-header';
+      header.textContent = currentRegion === 'HTC' ? 'High-Tech Corridor' : 'NW Florida Panhandle';
+      list.appendChild(header);
+      lastRegion = currentRegion;
+    }
+    
     const row = document.createElement('div');
     row.className = 'county-row';
     row.draggable = true;
