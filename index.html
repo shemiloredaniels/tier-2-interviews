@@ -3,110 +3,82 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>County Comparison - Click to Compare</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap');
-  * { box-sizing: border-box; margin: 0; padding: 0; }
+@import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800&family=Barlow:wght@400;500;600&display=swap');
+* { box-sizing: border-box; margin: 0; padding: 0; }
 
-  .argo-masthead {
-    background: #fff; border-bottom: 2px solid #C8102E;
-    padding: 14px 20px 10px; display: flex; align-items: center;
-    justify-content: center;
-  }
-  .argo-meta { font-family: 'Barlow Condensed', 'Arial Narrow', sans-serif; font-size: 14px; letter-spacing: 0.12em; color: #6B6B68; text-align: center; text-transform: uppercase; line-height: 1.6; font-weight: 600; }
+.argo-masthead { background: #fff; border-bottom: 2px solid #C8102E; padding: 14px 20px 10px; text-align: center; }
+.argo-meta { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; letter-spacing: 0.12em; color: #6B6B68; text-transform: uppercase; line-height: 1.6; font-weight: 600; }
 
-  #app {
-    display: flex; flex-direction: column; min-height: 600px;
-    border-left: 0.5px solid #DCDCD8; border-right: 0.5px solid #DCDCD8;
-    background: #F2F2F0; font-family: 'Barlow', sans-serif;
-  }
+#selection-display { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px 16px; background: #fff; border-bottom: 1px solid #e0e0e0; }
+.selection-box { border: 1.5px solid #ddd; border-radius: 3px; padding: 10px; min-height: 52px; }
+.selection-box.filled { border-color: #C8102E; background: rgba(200,16,46,0.02); }
+.sel-role { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #bbb; margin-bottom: 4px; }
+.sel-name { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 800; text-transform: uppercase; color: #1A1A1A; }
+.sel-empty { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; text-transform: uppercase; color: #ccc; }
+.sel-clear { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #bbb; margin-top: 4px; cursor: pointer; display: inline-block; }
+.sel-clear:hover { color: #C8102E; }
 
-  #body { display: flex; flex: 1; overflow: hidden; }
+#body { display: flex; height: calc(100vh - 250px); }
+#leaderboard { width: 210px; border-right: 1px solid #ccc; background: #ebebeb; overflow-y: auto; display: flex; flex-direction: column; }
+#lb-header { padding: 9px 14px; background: #fff; border-bottom: 1px solid #ccc; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; text-transform: uppercase; color: #777; }
+#lb-hint { padding: 6px 14px; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600; text-transform: uppercase; color: #bbb; }
+#list { flex: 1; overflow-y: auto; }
 
-  #leaderboard { width: 210px; min-width: 210px; display: flex; flex-direction: column; border-right: 1px solid #ccc; background: #ebebeb; overflow: hidden; }
-  #lb-header { display: flex; justify-content: space-between; align-items: center; padding: 9px 14px; border-bottom: 1px solid #ccc; background: #fff; flex-shrink: 0; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; color: #777; text-transform: uppercase; }
-  #lb-hint { padding: 6px 14px 4px; font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.06em; color: #bbb; text-transform: uppercase; flex-shrink: 0; }
-  #list { overflow-y: auto; flex: 1; }
+.region-header { padding: 10px 14px 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 800; text-transform: uppercase; color: #999; background: #f5f5f5; border-bottom: 1px solid #d8d8d8; }
+.county-row { padding: 7px 14px; cursor: pointer; border-bottom: 1px solid #d8d8d8; transition: background 0.1s; user-select: none; }
+.county-row:hover { background: #e0e0de; }
+.county-row.selected { background: #fff; border-left: 3px solid #C8102E; padding-left: 11px; }
+.county-name { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 
-  .region-header { padding: 10px 14px 6px; font-family: 'Barlow Condensed', sans-serif; font-size: 9px; font-weight: 800; letter-spacing: 0.12em; color: #999; text-transform: uppercase; background: #f5f5f5; border-bottom: 1px solid #d8d8d8; }
-  .county-row { display: flex; align-items: center; gap: 8px; padding: 7px 14px; cursor: pointer; border-bottom: 1px solid #d8d8d8; transition: background 0.1s; user-select: none; }
-  .county-row:hover { background: #e0e0de; }
-  .county-row.active { background: #fff; border-left: 3px solid #C8102E; padding-left: 11px; }
-  .county-row.dragging { opacity: 0.4; }
-  .county-row[draggable="true"] { cursor: grab; }
-  .county-name { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.05em; color: #1a1a1a; flex: 1; text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#detail { flex: 1; background: #fff; overflow-y: auto; padding: 16px; display: flex; flex-direction: column; }
+#parcom-empty { text-align: center; padding: 40px; color: #ccc; font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; text-transform: uppercase; }
+.hm-grid { display: grid; grid-template-columns: 152px 1fr 1fr; gap: 0; }
+.hm-header { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 800; text-transform: uppercase; padding: 8px; text-align: center; color: #1A1A1A; }
+.hm-param { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; text-transform: uppercase; color: #555; padding: 8px 10px 8px 0; border-top: 1px solid #eee; cursor: pointer; }
+.hm-param:hover { color: #1a1a1a; }
+.hm-cell { padding: 8px 6px; border-top: 1px solid #eee; text-align: center; display: flex; flex-direction: column; align-items: center; }
+.rating-pill { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 800; text-transform: uppercase; padding: 4px 12px; border-radius: 2px; cursor: pointer; width: 100%; text-align: center; }
+.rating-pill:hover { filter: brightness(0.92); }
+.justification-box { overflow: hidden; max-height: 0; transition: max-height 0.3s ease, opacity 0.2s ease; opacity: 0; width: 100%; margin-top: 5px; }
+.justification-box.open { max-height: 300px; opacity: 1; }
+.justification-text { font-family: 'Barlow', sans-serif; font-size: 11px; color: #333; line-height: 1.5; text-align: left; padding-top: 6px; border-top: 0.5px solid #eee; }
 
-  #detail { flex: 1; display: flex; flex-direction: column; background: #fff; min-width: 0; overflow: hidden; }
-  #parcom-view { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-  #drop-zones { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 12px 16px 10px; border-bottom: 1px solid #e0e0e0; flex-shrink: 0; position: sticky; top: 0; background: #fff; z-index: 10; }
-  .drop-zone { border: 1.5px dashed #ddd; border-radius: 3px; padding: 8px 12px; min-height: 52px; display: flex; flex-direction: column; justify-content: center; transition: border-color 0.15s, background 0.15s; }
-  .drop-zone.drag-over { border-color: #C8102E; background: rgba(200,16,46,0.04); }
-  .drop-zone.drag-active { border-color: #C8102E; border-style: solid; animation: pulse 1s ease-in-out infinite; }
-  @keyframes pulse { 0%, 100% { background: rgba(200,16,46,0.03); } 50% { background: rgba(200,16,46,0.08); } }
-  .drop-zone.filled { border-style: solid; border-color: #ccc; }
-  .dz-role { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; color: #bbb; margin-bottom: 2px; }
-  .dz-name { font-family: 'Barlow Condensed', sans-serif; font-size: 14px; font-weight: 800; letter-spacing: 0.05em; text-transform: uppercase; line-height: 1.1; }
-  .dz-empty { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 600; letter-spacing: 0.07em; text-transform: uppercase; color: #ccc; }
-  .dz-clear { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 700; letter-spacing: 0.06em; text-transform: uppercase; color: #bbb; margin-top: 3px; cursor: pointer; display: inline-block; }
-  .dz-clear:hover { color: #C8102E; }
-
-  #parcom-table-wrap { flex: 1; overflow-y: auto; padding: 0 16px 14px; }
-  .hm-grid { display: grid; grid-template-columns: 152px 1fr 1fr; gap: 0; margin-top: 10px; }
-  .hm-header { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; padding: 0 8px 8px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 1px; }
-  .hm-param { font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.04em; text-transform: uppercase; color: #555; padding: 8px 10px 8px 0; display: flex; align-items: flex-start; flex-direction: column; border-top: 1px solid #eee; cursor: pointer; }
-  .hm-param:hover { color: #1a1a1a; }
-  .hm-cell { padding: 8px 6px; display: flex; flex-direction: column; align-items: center; justify-content: center; border-top: 1px solid #eee; }
-  .rating-pill { display: inline-block; font-family: 'Barlow Condensed', sans-serif; font-size: 11px; font-weight: 800; letter-spacing: 0.07em; text-transform: uppercase; padding: 4px 12px; border-radius: 2px; width: 100%; text-align: center; cursor: pointer; transition: filter 0.12s; }
-  .rating-pill:hover { filter: brightness(0.92); }
-  .justification-box { overflow: hidden; max-height: 0; transition: max-height 0.3s ease, opacity 0.2s ease; opacity: 0; width: 100%; }
-  .justification-box.open { max-height: 300px; opacity: 1; }
-  .justification-inner { border-top: 0.5px solid #eee; margin-top: 5px; padding-top: 6px; padding-bottom: 4px; }
-  .justification-text { font-family: 'Barlow', sans-serif; font-size: 11px; color: #333; line-height: 1.5; margin: 0; text-align: left; }
-  #parcom-empty { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
-  .es-label { font-family: 'Barlow Condensed', sans-serif; font-size: 13px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: #ccc; }
-
-  .argo-footer { font-size: 9px; letter-spacing: 0.1em; text-transform: uppercase; color: #9A9A96; text-align: center; padding: 10px 16px 14px; border-top: 0.5px solid #DCDCD8; background: #F2F2F0; }
-  .argo-footer-bar { height: 3px; background: #C8102E; margin: 0 0 8px; }
-  .color-key { display: flex; justify-content: center; gap: 20px; margin-top: 8px; }
-  .key-item { display: flex; align-items: center; gap: 6px; }
-  .key-swatch { width: 12px; height: 12px; border-radius: 2px; }
-  .key-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; color: #6B6B68; }
+.argo-footer { font-size: 9px; text-transform: uppercase; color: #9A9A96; text-align: center; padding: 10px 16px 14px; border-top: 0.5px solid #DCDCD8; background: #F2F2F0; }
+.argo-footer-bar { height: 3px; background: #C8102E; margin: 0 0 8px; }
+.color-key { display: flex; justify-content: center; gap: 20px; margin-top: 8px; }
+.key-item { display: flex; align-items: center; gap: 6px; }
+.key-swatch { width: 12px; height: 12px; border-radius: 2px; }
+.key-label { font-family: 'Barlow Condensed', sans-serif; font-size: 10px; font-weight: 600; text-transform: uppercase; color: #6B6B68; }
 </style>
 </head>
 <body>
-
-<h2 style="position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0,0,0,0);">County parameter comparison</h2>
 
 <div class="argo-masthead">
   <div class="argo-meta">Community Implications for Shipbuilding Revitalization Readiness<br>May 2026 • 47 Interviews Conducted</div>
 </div>
 
-<div id="app">
-  <div id="body">
-    <div id="leaderboard">
-      <div id="lb-header"><span>County</span></div>
-      <div id="lb-hint">Drag to compare</div>
-      <div id="list"></div>
-    </div>
-    <div id="detail">
-      <div id="parcom-view" style="display:flex;">
-        <div id="drop-zones">
-          <div class="drop-zone" id="dz-a" ondragover="dzOver(event,'a')" ondragleave="dzLeave('a')" ondrop="dzDrop(event,'a')">
-            <div class="dz-role">County A</div>
-            <div id="dz-a-content"><div class="dz-empty">Drop county here</div></div>
-          </div>
-          <div class="drop-zone" id="dz-b" ondragover="dzOver(event,'b')" ondragleave="dzLeave('b')" ondrop="dzDrop(event,'b')">
-            <div class="dz-role">County B</div>
-            <div id="dz-b-content"><div class="dz-empty">Drop county here</div></div>
-          </div>
-        </div>
-        <div id="parcom-table-wrap">
-          <div id="hm-grid-wrap"></div>
-        </div>
-        <div id="parcom-empty" style="display:flex;">
-          <div class="es-label">Select two counties to compare</div>
-        </div>
-      </div>
-    </div>
+<div id="selection-display">
+  <div class="selection-box" id="sel-a">
+    <div class="sel-role">County A</div>
+    <div id="sel-a-content"><div class="sel-empty">Click a county to select</div></div>
+  </div>
+  <div class="selection-box" id="sel-b">
+    <div class="sel-role">County B</div>
+    <div id="sel-b-content"><div class="sel-empty">Click a county to select</div></div>
+  </div>
+</div>
+
+<div id="body">
+  <div id="leaderboard">
+    <div id="lb-header">County</div>
+    <div id="lb-hint">Click to compare</div>
+    <div id="list"></div>
+  </div>
+  <div id="detail">
+    <div id="hm-grid-wrap"></div>
+    <div id="parcom-empty">Select two counties to compare</div>
   </div>
 </div>
 
@@ -2223,191 +2195,122 @@ const COUNTIES = [
   }
 ];
 
-let parcomA = null;
-let parcomB = null;
-let dragIdx = null;
+let selectedA = null;
+let selectedB = null;
 
 function renderList() {
   const list = document.getElementById('list');
   list.innerHTML = '';
   
-  // Define regions
-  const HTC_COUNTIES = ['Alachua', 'Brevard', 'Citrus', 'DeSoto', 'Flagler', 'Hardee', 'Hernando', 'Highlands', 'Hillsborough', 'Lake', 'Levy', 'Manatee', 'Marion', 'Orange', 'Osceola', 'Pasco', 'Pinellas', 'Polk', 'Putnam', 'Sarasota', 'Seminole', 'Sumter', 'Volusia'];
-  const PANHANDLE_COUNTIES = ['Bay', 'Calhoun', 'Escambia', 'Franklin', 'Gadsden', 'Gulf', 'Holmes', 'Jackson', 'Jefferson', 'Leon', 'Liberty', 'Okaloosa', 'Santa Rosa', 'Wakulla', 'Walton', 'Washington'];
+  const HTC = ['Alachua', 'Brevard', 'Citrus', 'DeSoto', 'Flagler', 'Hardee', 'Hernando', 'Highlands', 'Hillsborough', 'Lake', 'Levy', 'Manatee', 'Marion', 'Orange', 'Osceola', 'Pasco', 'Pinellas', 'Polk', 'Putnam', 'Sarasota', 'Seminole', 'Sumter', 'Volusia'];
+  const PAN = ['Bay', 'Calhoun', 'Escambia', 'Franklin', 'Gadsden', 'Gulf', 'Holmes', 'Jackson', 'Jefferson', 'Leon', 'Liberty', 'Okaloosa', 'Santa Rosa', 'Wakulla', 'Walton', 'Washington'];
   
   let lastRegion = null;
   
   COUNTIES.forEach((c, idx) => {
-    // Determine current region
-    let currentRegion = null;
-    if (HTC_COUNTIES.includes(c.name)) currentRegion = 'HTC';
-    else if (PANHANDLE_COUNTIES.includes(c.name)) currentRegion = 'PANHANDLE';
+    let region = HTC.includes(c.name) ? 'HTC' : (PAN.includes(c.name) ? 'PAN' : null);
     
-    // Add region header if region changes
-    if (currentRegion !== lastRegion && currentRegion !== null) {
-      const header = document.createElement('div');
-      header.className = 'region-header';
-      header.textContent = currentRegion === 'HTC' ? 'High-Tech Corridor' : 'NW Florida Panhandle';
-      list.appendChild(header);
-      lastRegion = currentRegion;
+    if (region !== lastRegion && region) {
+      const h = document.createElement('div');
+      h.className = 'region-header';
+      h.textContent = region === 'HTC' ? 'High-Tech Corridor' : 'NW Florida Panhandle';
+      list.appendChild(h);
+      lastRegion = region;
     }
     
     const row = document.createElement('div');
     row.className = 'county-row';
-    row.draggable = true;
     row.innerHTML = `<div class="county-name">${c.name}</div>`;
-    row.addEventListener('dragstart', () => { 
-      dragIdx = idx; 
-      row.classList.add('dragging');
-      // Highlight drop zones during drag
-      document.getElementById('dz-a').classList.add('drag-active');
-      document.getElementById('dz-b').classList.add('drag-active');
-    });
-    row.addEventListener('dragend', () => { 
-      row.classList.remove('dragging');
-      // Remove highlight when drag ends
-      document.getElementById('dz-a').classList.remove('drag-active');
-      document.getElementById('dz-b').classList.remove('drag-active');
-    });
+    row.onclick = () => selectCounty(idx);
     list.appendChild(row);
   });
 }
 
-function dzOver(e, slot) {
-  e.preventDefault();
-  document.getElementById('dz-' + slot).classList.add('drag-over');
-}
-
-function dzLeave(slot) {
-  document.getElementById('dz-' + slot).classList.remove('drag-over');
-}
-
-function dzDrop(e, slot) {
-  e.preventDefault();
-  dzLeave(slot);
-  if (dragIdx === null) return;
-  if (slot === 'a') parcomA = dragIdx;
-  else parcomB = dragIdx;
-  dragIdx = null;
-  updateDropZones();
-  renderParcom();
-}
-
-function updateDropZones() {
-  const upd = (slot, idx) => {
-    const dz = document.getElementById('dz-' + slot);
-    const content = document.getElementById('dz-' + slot + '-content');
-    if (idx !== null) {
-      dz.classList.add('filled');
-      content.innerHTML = `<div class="dz-name" style="color:#1A1A1A">${COUNTIES[idx].name}</div><span class="dz-clear" onclick="clearDZ('${slot}')">Clear &times;</span>`;
-    } else {
-      dz.classList.remove('filled');
-      content.innerHTML = `<div class="dz-empty">Drop county here</div>`;
-    }
-  };
-  upd('a', parcomA);
-  upd('b', parcomB);
-}
-
-function clearDZ(slot) {
-  if (slot === 'a') parcomA = null;
-  else parcomB = null;
-  updateDropZones();
-  renderParcom();
-}
-
-function renderParcom() {
-  const empty = document.getElementById('parcom-empty');
-  const gridWrap = document.getElementById('hm-grid-wrap');
+function selectCounty(idx) {
+  if (selectedA === idx) selectedA = null;
+  else if (selectedB === idx) selectedB = null;
+  else if (selectedA === null) selectedA = idx;
+  else if (selectedB === null) selectedB = idx;
+  else { selectedA = selectedB; selectedB = idx; }
   
-  if (parcomA === null || parcomB === null) {
-    empty.style.display = 'flex';
-    gridWrap.style.display = 'none';
+  updateUI();
+}
+
+function updateUI() {
+  document.querySelectorAll('.county-row').forEach((row, i) => {
+    row.classList.toggle('selected', i === selectedA || i === selectedB);
+  });
+  
+  ['a', 'b'].forEach((slot, i) => {
+    const idx = i === 0 ? selectedA : selectedB;
+    const box = document.getElementById('sel-' + slot);
+    const content = document.getElementById('sel-' + slot + '-content');
+    if (idx !== null) {
+      box.classList.add('filled');
+      content.innerHTML = `<div class="sel-name">${COUNTIES[idx].name}</div><span class="sel-clear" onclick="clearSel('${slot}')">Clear ×</span>`;
+    } else {
+      box.classList.remove('filled');
+      content.innerHTML = '<div class="sel-empty">Click a county to select</div>';
+    }
+  });
+  
+  renderComparison();
+}
+
+function clearSel(slot) {
+  if (slot === 'a') selectedA = null;
+  else selectedB = null;
+  updateUI();
+}
+
+function renderComparison() {
+  const empty = document.getElementById('parcom-empty');
+  const grid = document.getElementById('hm-grid-wrap');
+  
+  if (selectedA === null || selectedB === null) {
+    empty.style.display = 'block';
+    grid.style.display = 'none';
     return;
   }
   
   empty.style.display = 'none';
-  gridWrap.style.display = 'block';
+  grid.style.display = 'block';
   
-  const cA = COUNTIES[parcomA];
-  const cB = COUNTIES[parcomB];
+  const cA = COUNTIES[selectedA];
+  const cB = COUNTIES[selectedB];
   
-  gridWrap.innerHTML = '';
-  const grid = document.createElement('div');
-  grid.className = 'hm-grid';
+  let html = '<div class="hm-grid">';
+  html += '<div class="hm-param" style="border-top:none;"></div>';
+  html += `<div class="hm-header" style="border-top:none;">${cA.name}</div>`;
+  html += `<div class="hm-header" style="border-top:none;">${cB.name}</div>`;
   
-  // Headers
-  const hEl = (cls, style, html) => {
-    const el = document.createElement('div');
-    el.className = cls;
-    if (style) el.style.cssText = style;
-    if (html !== undefined) el.innerHTML = html;
-    return el;
-  };
-  
-  const hA = hEl('hm-header', 'color:#1A1A1A;border-top:none;');
-  hA.innerHTML = cA.name;
-  const hB = hEl('hm-header', 'color:#1A1A1A;border-top:none;');
-  hB.innerHTML = cB.name;
-  grid.append(hEl('hm-param', 'border-top:none;'), hA, hB);
-  
-  // Parameters
-  PARAMETERS.forEach((paramName, i) => {
-    const paramA = cA.params[i];
-    const paramB = cB.params[i];
+  PARAMETERS.forEach((param, i) => {
+    const pA = cA.params[i];
+    const pB = cB.params[i];
     
-    const paramCell = hEl('hm-param', '', paramName);
+    html += `<div class="hm-param" onclick="toggleRow(${i})">${param}</div>`;
     
-    const makePillCell = (paramData) => {
-      const cell = hEl('hm-cell', '', '');
-      
-      if (!paramData) {
-        cell.innerHTML = '<div class="rating-pill" style="background:#f0f0f0;color:#999;">Not Covered</div>';
-        return { cell, pill: null, justBox: null };
+    [pA, pB].forEach(p => {
+      html += '<div class="hm-cell">';
+      if (p) {
+        const color = RATING_COLOR[p.rating] || '#999';
+        const bg = RATING_BG[p.rating] || '#f0f0f0';
+        html += `<div class="rating-pill" style="background:${bg};color:${color};" onclick="toggleRow(${i})">${p.rating}</div>`;
+        html += `<div class="justification-box" id="just-${i}"><div class="justification-text">${p.justification}</div></div>`;
+      } else {
+        html += '<div class="rating-pill" style="background:#f0f0f0;color:#999;">Not Covered</div>';
       }
-      
-      const pill = document.createElement('div');
-      pill.className = 'rating-pill';
-      const ratingColor = RATING_COLOR[paramData.rating] || '#999';
-      const ratingBg = RATING_BG[paramData.rating] || '#f0f0f0';
-      pill.style.cssText = `background:${ratingBg};color:${ratingColor};`;
-      pill.textContent = paramData.rating;
-      
-      const justBox = document.createElement('div');
-      justBox.className = 'justification-box';
-      justBox.innerHTML = `<div class="justification-inner"><div class="justification-text">${paramData.justification}</div></div>`;
-      
-      cell.appendChild(pill);
-      cell.appendChild(justBox);
-      
-      return { cell, pill, justBox };
-    };
-    
-    const cellA = makePillCell(paramA);
-    const cellB = makePillCell(paramB);
-    
-    let rowOpen = false;
-    
-    const toggleRow = () => {
-      rowOpen = !rowOpen;
-      if (cellA.justBox) {
-        cellA.justBox.classList.toggle('open', rowOpen);
-        if (cellA.pill) cellA.pill.style.borderRadius = rowOpen ? '2px 2px 0 0' : '2px';
-      }
-      if (cellB.justBox) {
-        cellB.justBox.classList.toggle('open', rowOpen);
-        if (cellB.pill) cellB.pill.style.borderRadius = rowOpen ? '2px 2px 0 0' : '2px';
-      }
-    };
-    
-    [paramCell, cellA.cell, cellB.cell].forEach(el => {
-      el.addEventListener('click', toggleRow);
+      html += '</div>';
     });
-    
-    grid.append(paramCell, cellA.cell, cellB.cell);
   });
   
-  gridWrap.appendChild(grid);
+  html += '</div>';
+  grid.innerHTML = html;
+}
+
+function toggleRow(idx) {
+  const boxes = document.querySelectorAll(`#just-${idx}`);
+  boxes.forEach(box => box.classList.toggle('open'));
 }
 
 renderList();
