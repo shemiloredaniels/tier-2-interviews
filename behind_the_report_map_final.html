@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Behind the Report — Three County Stories</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.8.5/d3.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/topojson/3.0.2/topojson.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500&display=swap');
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Barlow', sans-serif;
+    background: #f7f6f2;
+    color: #111;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 1.5rem;
+  }
+  .header {
+    width: 100%;
+    max-width: 1000px;
+    border-bottom: 3px solid #CC0000;
+    padding-bottom: 0.6rem;
+    margin-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+  }
+  .title-block h1 {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    text-transform: uppercase;
+    color: #111;
+    line-height: 1;
+  }
+  .title-block p {
+    font-size: 11px;
+    font-weight: 300;
+    color: #666;
+    margin-top: 3px;
+  }
+  .controls {
+    width: 100%;
+    max-width: 1000px;
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    margin-bottom: 0.75rem;
+    flex-wrap: wrap;
+  }
+  .legend-group { display: flex; flex-direction: column; gap: 4px; }
+  .legend-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #999;
+    margin-bottom: 2px;
+  }
+  .legend-row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .leg-item {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    color: #444;
+  }
+  .leg-swatch {
+    width: 13px;
+    height: 13px;
+    border-radius: 2px;
+    flex-shrink: 0;
+  }
+  .map-wrapper {
+    width: 100%;
+    max-width: 1000px;
+    background: #e8e6e0;
+    border-radius: 3px;
+    overflow: hidden;
+  }
+  #map svg { width: 100%; height: auto; display: block; }
+  .county-path { stroke: #fff; stroke-width: 0.6; }
+  .county-path.highlight { cursor: pointer; }
+  .county-path.highlight:hover { opacity: 0.85; }
+  .county-border { fill: none; stroke: #333; stroke-width: 1.2; pointer-events: none; }
+  .tooltip {
+    position: fixed;
+    background: #111;
+    color: #fff;
+    padding: 12px 16px;
+    border-radius: 3px;
+    font-size: 12px;
+    line-height: 1.7;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 999;
+    max-width: 420px;
+    transition: opacity 0.15s;
+  }
+  .tooltip strong {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .note {
+    width: 100%;
+    max-width: 1000px;
+    margin-top: 0.6rem;
+    font-size: 10px;
+    color: #aaa;
+    font-style: italic;
+  }
+</style>
+</head>
+<body>
+
+<div class="header">
+  <div class="title-block">
+    <h1>Behind the Report — Three County Stories</h1>
+    <p>Qualitative insights from community interviews · DIBI / USF / FGNW · 2025</p>
+  </div>
+</div>
+
+<div class="controls">
+  <div class="legend-group">
+    <div class="legend-label">Investment Readiness</div>
+    <div class="legend-row">
+      <div class="leg-item"><div class="leg-swatch" style="background:#3A7D2C;"></div>Strong workforce alignment</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#D4A017;"></div>Conditions present, commitment needed</div>
+      <div class="leg-item"><div class="leg-swatch" style="background:#C8C4BA; border:1px solid #bbb;"></div>Other counties</div>
+    </div>
+  </div>
+</div>
+
+<div class="map-wrapper">
+  <div id="map"></div>
+</div>
+<div class="note">Hover over Escambia, Brevard, or Pinellas to read the full story</div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const countyData = {
+  // Three highlighted counties
+  "12033": { 
+    name: "Escambia", 
+    designation: "good",
+    title: "Escambia County: Workforce DNA",
+    narrative: "Northwest Florida's relationship with shipbuilding is generational. Escambia County sits at the center of a region where maritime work has shaped labor markets, skill pipelines, and community identity for decades. This cultural habituation matters. When interviewees described the Panhandle's workforce, they didn't talk about training programs or incentive packages first — they talked about people who already understood the work. For Escambia and its neighbors, investment isn't about creating a shipbuilding culture from scratch. It's about activating one that already exists."
+  },
+  "12009": { 
+    name: "Brevard", 
+    designation: "notable",
+    title: "Brevard County: Conditions Without Commitment",
+    narrative: "Brevard County should be a simple story. The industrial infrastructure is there: deep-water port access, aerospace manufacturing capacity, skilled technical workforce, proximity to defense installations. On paper, the county checks every readiness box. But the community input told a different story. Workers in Brevard identified more with aerospace, not shipbuilding. This isn't a workforce gap, it's an identity gap. Brevard has the conditions for shipbuilding investment, but it lacks the cultural readiness that makes recruitment easy and retention durable."
+  },
+  "12103": { 
+    name: "Pinellas", 
+    designation: "good",
+    title: "Pinellas County: Manufacturing Powerhouse",
+    narrative: "In Pinellas, manufacturing and defense drive more economic activity than tourism. Raytheon, Honeywell, and a network of high-tech manufacturers anchor an industrial base that operates largely out of public perception. The county produces microelectronics, medical devices, and defense components. Community interviews confirmed what the data suggested. The county's 2022 Target Employment and Industrial Land Study identified seven industrial clusters, from life sciences to aerospace. Since 2012, Pinellas has maintained a no-net-loss policy on industrial land, a policy almost unheard of in coastal Florida, where residential development pressure typically wins. The county also solved a problem most regions struggle with: cross-county coordination. Pinellas, Hillsborough, and Pasco now function as a single labor market. Three bridges connect them. Workers commute fluidly across county lines."
+  }
+};
+
+const colorMap = {
+  "good":    "#3A7D2C",
+  "notable": "#D4A017",
+  "other":   "#C8C4BA"
+};
+
+const tooltip = document.getElementById('tooltip');
+function showTip(event, html) {
+  tooltip.innerHTML = html;
+  tooltip.style.opacity = 1;
+  const x = event.clientX + 16;
+  const y = event.clientY - 10;
+  tooltip.style.left = x + 'px';
+  tooltip.style.top  = y + 'px';
+}
+function hideTip() { tooltip.style.opacity = 0; }
+
+const container = document.getElementById('map');
+const width  = Math.max(container.offsetWidth || 900, 600);
+const height = Math.round(width * 0.58);
+
+const svg = d3.select('#map').append('svg')
+  .attr('viewBox', `0 0 ${width} ${height}`)
+  .attr('width', '100%');
+
+d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json').then(us => {
+  const allCounties = topojson.feature(us, us.objects.counties).features;
+  const florida = allCounties.filter(d => d.id.toString().startsWith('12'));
+
+  const projection = d3.geoAlbersUsa()
+    .fitSize([width, height], { type: 'FeatureCollection', features: florida });
+  const path = d3.geoPath(projection);
+
+  const g = svg.append('g');
+
+  // Draw all Florida counties
+  florida.forEach(county => {
+    const fips = county.id.toString();
+    const data = countyData[fips];
+    const isHighlight = !!data;
+    const color = data ? colorMap[data.designation] : colorMap.other;
+
+    g.append('path')
+      .datum(county)
+      .attr('class', isHighlight ? 'county-path highlight' : 'county-path')
+      .attr('d', path)
+      .attr('fill', color)
+      .on('mouseenter', function(event) {
+        if (data && data.narrative) {
+          const html = `<strong>${data.title}</strong>${data.narrative}`;
+          showTip(event, html);
+        }
+      })
+      .on('mousemove', function(event) {
+        if (data && data.narrative) {
+          tooltip.style.left = (event.clientX + 16) + 'px';
+          tooltip.style.top  = (event.clientY - 10) + 'px';
+        }
+      })
+      .on('mouseleave', hideTip);
+  });
+
+  // Draw county borders
+  g.append('path')
+    .datum(topojson.mesh(us, us.objects.counties, (a, b) => 
+      a.id.toString().startsWith('12') && b.id.toString().startsWith('12') && a !== b
+    ))
+    .attr('class', 'county-border')
+    .attr('d', path);
+
+}).catch(err => console.error('Map load error:', err));
+</script>
+</body>
+</html>
