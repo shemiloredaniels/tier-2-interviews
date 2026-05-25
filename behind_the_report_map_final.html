@@ -9,6 +9,7 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700&family=Barlow:wght@300;400;500&display=swap');
   *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
   body {
     font-family: 'Barlow', sans-serif;
     background: #f7f6f2;
@@ -19,15 +20,13 @@
     align-items: center;
     padding: 1.5rem;
   }
+
   .header {
     width: 100%;
-    max-width: 1000px;
+    max-width: 1100px;
     border-bottom: 3px solid #CC0000;
     padding-bottom: 0.6rem;
     margin-bottom: 1rem;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-end;
   }
   .title-block h1 {
     font-family: 'Barlow Condensed', sans-serif;
@@ -44,16 +43,17 @@
     color: #666;
     margin-top: 3px;
   }
-  .controls {
+
+  /* ── Legend ── */
+  .legend {
     width: 100%;
-    max-width: 1000px;
+    max-width: 1100px;
     display: flex;
-    gap: 24px;
-    align-items: flex-start;
-    margin-bottom: 0.75rem;
+    gap: 20px;
     flex-wrap: wrap;
+    margin-bottom: 0.75rem;
+    align-items: center;
   }
-  .legend-group { display: flex; flex-direction: column; gap: 4px; }
   .legend-label {
     font-family: 'Barlow Condensed', sans-serif;
     font-size: 10px;
@@ -61,9 +61,8 @@
     letter-spacing: 0.08em;
     text-transform: uppercase;
     color: #999;
-    margin-bottom: 2px;
+    margin-right: 4px;
   }
-  .legend-row { display: flex; gap: 14px; flex-wrap: wrap; }
   .leg-item {
     display: flex;
     align-items: center;
@@ -72,69 +71,174 @@
     color: #444;
   }
   .leg-swatch {
-    width: 13px;
-    height: 13px;
+    width: 13px; height: 13px;
     border-radius: 2px;
     flex-shrink: 0;
   }
-  .map-wrapper {
+
+  /* ── Main layout ── */
+  .main {
     width: 100%;
-    max-width: 1000px;
+    max-width: 1100px;
+    display: flex;
+    gap: 0;
     background: #e8e6e0;
     border-radius: 3px;
     overflow: hidden;
   }
+
+  /* ── Map panel ── */
+  .map-panel {
+    flex: 0 0 55%;
+    position: relative;
+  }
   #map svg { width: 100%; height: auto; display: block; }
+
+  /* ── Story panel ── */
+  .story-panel {
+    flex: 1;
+    background: #fff;
+    display: flex;
+    flex-direction: column;
+    min-height: 480px;
+  }
+
+  /* County tabs */
+  .tabs {
+    display: flex;
+    border-bottom: 2px solid #e8e6e0;
+  }
+  .tab {
+    flex: 1;
+    padding: 10px 6px 8px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    text-align: center;
+    cursor: pointer;
+    border: none;
+    background: #f7f6f2;
+    color: #999;
+    border-right: 1px solid #e8e6e0;
+    transition: background 0.15s, color 0.15s;
+    position: relative;
+  }
+  .tab:last-child { border-right: none; }
+  .tab.active {
+    background: #fff;
+    color: #111;
+  }
+  .tab.active::after {
+    content: '';
+    position: absolute;
+    bottom: -2px;
+    left: 0; right: 0;
+    height: 3px;
+    background: var(--county-color, #3A7D2C);
+  }
+  .tab .tab-dot {
+    display: inline-block;
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    margin-right: 5px;
+    vertical-align: middle;
+  }
+
+  /* Slide container */
+  .slides {
+    flex: 1;
+    overflow: hidden;
+    position: relative;
+  }
+  .slide {
+    position: absolute;
+    inset: 0;
+    padding: 22px 24px 20px;
+    overflow-y: auto;
+    opacity: 0;
+    pointer-events: none;
+    transform: translateX(30px);
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+  .slide.active {
+    opacity: 1;
+    pointer-events: auto;
+    transform: translateX(0);
+  }
+  .slide-county {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    margin-bottom: 4px;
+  }
+  .slide-title {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 19px;
+    font-weight: 700;
+    line-height: 1.15;
+    margin-bottom: 12px;
+    color: #111;
+  }
+  .slide-body {
+    font-size: 12.5px;
+    line-height: 1.75;
+    color: #333;
+  }
+  .slide-body p { margin-bottom: 10px; }
+  .slide-body p:last-child { margin-bottom: 0; }
+
+  /* Nav arrows */
+  .nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px 18px 12px;
+    border-top: 1px solid #e8e6e0;
+  }
+  .nav-btn {
+    background: none;
+    border: 1px solid #ccc;
+    border-radius: 3px;
+    padding: 5px 12px;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    cursor: pointer;
+    color: #555;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .nav-btn:hover { border-color: #888; color: #111; }
+  .nav-btn:disabled { opacity: 0.25; cursor: default; }
+  .nav-dots { display: flex; gap: 7px; }
+  .nav-dot {
+    width: 7px; height: 7px;
+    border-radius: 50%;
+    background: #ccc;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .nav-dot.active { background: #555; }
+
+  /* Map path styles */
   .county-path { stroke: #fff; stroke-width: 0.6; }
   .county-path.highlight { cursor: pointer; }
-  .county-path.highlight:hover { opacity: 0.85; }
   .county-border { fill: none; stroke: #333; stroke-width: 1.2; pointer-events: none; }
-  .tooltip {
-    position: fixed;
-    background: #111;
-    color: #fff;
-    padding: 12px 16px;
-    border-radius: 3px;
-    font-size: 12px;
-    line-height: 1.7;
-    pointer-events: none;
-    opacity: 0;
-    z-index: 999;
-    max-width: 420px;
-    transition: opacity 0.15s;
-  }
-  .tooltip strong {
-    font-family: 'Barlow Condensed', sans-serif;
-    font-size: 14px;
-    font-weight: 700;
-    display: block;
-    margin-bottom: 6px;
-  }
+  .county-path.highlight.selected { stroke: #111; stroke-width: 1.6; }
+
   .note {
     width: 100%;
-    max-width: 1000px;
+    max-width: 1100px;
     margin-top: 0.6rem;
     font-size: 10px;
     color: #aaa;
     font-style: italic;
   }
-  .toggle-btn {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-    font-family: 'Barlow', sans-serif;
-    font-size: 11.5px;
-    color: #444;
-    background: none;
-    border: 1px solid #ccc;
-    border-radius: 3px;
-    padding: 3px 8px 3px 5px;
-    cursor: pointer;
-    transition: border-color 0.15s, opacity 0.15s;
-    user-select: none;
-  }
-  .toggle-btn:hover { border-color: #888; }
-  .toggle-btn.off { opacity: 0.4; }
 </style>
 </head>
 <body>
@@ -146,84 +250,149 @@
   </div>
 </div>
 
-<div class="controls">
-  <div class="legend-group">
-    <div class="legend-label">Investment Readiness</div>
-    <div class="legend-row">
-      <div class="leg-item"><div class="leg-swatch" style="background:#3A7D2C;"></div> Most Ready </div>
-      <div class="leg-item"><div class="leg-swatch" style="background:#D4A017;"></div> Notably Ready </div>
-      <div class="leg-item"><div class="leg-swatch" style="background:#C8C4BA; border:1px solid #bbb;"></div>Other counties</div>
-    </div>
-  </div>
-  <div class="legend-group">
-    <div class="legend-label">Overlays</div>
-    <div class="legend-row">
-      <button class="toggle-btn" id="btn-oz" onclick="toggleLayer('oz')">
-        <svg width="13" height="13" style="flex-shrink:0"><rect width="13" height="13" fill="rgba(91,79,207,0.28)" stroke="#5B4FCF" stroke-width="1.5" stroke-dasharray="3,2"/></svg>
-        Opportunity Zones
-      </button>
-      <button class="toggle-btn" id="btn-anchor" onclick="toggleLayer('anchor')">
-        <svg width="13" height="13" style="flex-shrink:0"><rect width="13" height="13" fill="rgba(204,0,0,0.18)" stroke="#CC0000" stroke-width="1.5"/></svg>
-        Anchor Tracts
-      </button>
-    </div>
-  </div>
+<div class="legend">
+  <span class="legend-label">Investment Readiness</span>
+  <div class="leg-item"><div class="leg-swatch" style="background:#3A7D2C;"></div> Most Ready</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#D4A017;"></div> Notably Ready</div>
+  <div class="leg-item"><div class="leg-swatch" style="background:#C8C4BA; border:1px solid #bbb;"></div> Other Counties</div>
 </div>
 
-<div class="map-wrapper">
-  <div id="map"></div>
-</div>
-<div class="note">Hover over Escambia, Brevard, or Pinellas to read the full story</div>
+<div class="main">
 
-<div class="tooltip" id="tooltip"></div>
+  <!-- Map -->
+  <div class="map-panel">
+    <div id="map"></div>
+  </div>
+
+  <!-- Story panel -->
+  <div class="story-panel">
+
+    <div class="tabs">
+      <button class="tab active" data-index="0" style="--county-color:#3A7D2C;">
+        <span class="tab-dot" style="background:#3A7D2C;"></span>Escambia
+      </button>
+      <button class="tab" data-index="1" style="--county-color:#D4A017;">
+        <span class="tab-dot" style="background:#D4A017;"></span>Brevard
+      </button>
+      <button class="tab" data-index="2" style="--county-color:#3A7D2C;">
+        <span class="tab-dot" style="background:#3A7D2C;"></span>Pinellas
+      </button>
+    </div>
+
+    <div class="slides">
+
+      <!-- Escambia -->
+      <div class="slide active" data-index="0">
+        <div class="slide-county" style="color:#3A7D2C;">Most Ready</div>
+        <div class="slide-title">Escambia</div>
+        <div class="slide-body">
+          <p>Northwest Florida's relationship with shipbuilding is generational. Escambia County sits at the center of a region where maritime work has shaped labor markets, skill pipelines, and community identity for decades. This cultural habituation matters. When interviewees described the Panhandle's workforce, they didn't talk about training programs or incentive packages first — they talked about people who already understood the work.</p>
+          <p>Importantly, Santa Rosa County directly next door, and nearby Bay and Calhoun counties around Panama City, also score high in readiness for revitalization — adding even more weight to the Northwest Florida Panhandle as a strong regional location for ship and module construction.</p>
+          <p>For Escambia and its NWF neighbors, investment isn't about creating a shipbuilding culture from scratch. It's about activating and revitalizing one that already exists.</p>
+        </div>
+      </div>
+
+      <!-- Brevard -->
+      <div class="slide" data-index="1">
+        <div class="slide-county" style="color:#D4A017;">Notably Ready</div>
+        <div class="slide-title">Brevard</div>
+        <div class="slide-body">
+          <p>Brevard County's profile is compelling based on quantitative statistics and historic track record relative to the high-tech world of the space race. The industrial infrastructure is there: deep-water port access, aerospace manufacturing capacity, skilled technical workforce, proximity to defense installations.</p>
+          <p>But the community-voiced, qualitative input adds important additional layers. Community members and workers identify strongly with aerospace. Community identity is focused on maintaining what residents see as an ideal balance among high-tech and high-wage space sector contributions, economic inputs from cruise ships and tourism, and strong preservation values for remaining coastal landscapes. Manufacturing valued in Brevard is largely consonant with High-Tech Corridor manufacturing, and less with the more traditional blue-collar manufacturing of shipbuilding.</p>
+          <p>Investments here in high-tech shipbuilding components will be well placed — still essential elements of a powerful, regionally distributed network of Florida maritime prosperity zones contributing to the nation's revitalized shipbuilding capacity.</p>
+        </div>
+      </div>
+
+      <!-- Pinellas -->
+      <div class="slide" data-index="2">
+        <div class="slide-county" style="color:#3A7D2C;">Most Ready</div>
+        <div class="slide-title">Pinellas</div>
+        <div class="slide-body">
+          <p>In Pinellas, manufacturing and defense drive more economic activity than tourism. Raytheon, Honeywell, and a network of high-tech manufacturers anchor an industrial base that operates largely outside of daily public notice. The county produces microelectronics, medical devices, and defense components. The county's 2022 Target Employment and Industrial Land Study identified seven industrial clusters — from life sciences to aerospace — that signal robust participation in high-tech manufacturing.</p>
+          <p>Community interviews confirm what the quantitative data suggests: Pinellas is highly ready for successful participation in a revitalized shipbuilding economy. Since 2012, Pinellas has maintained a no-net-loss policy on industrial land — a policy almost unheard of in coastal Florida, where residential development pressure typically wins.</p>
+          <p>The county also solved a problem most regions struggle with: cross-jurisdictional coordination. Three bridges connect Pinellas, Hillsborough, and Pasco counties. Workers commute and goods transit fluidly across county lines — Pinellas, Hillsborough, and Pasco now function as a single labor market. Given its strength of social resilience, social capital, and business readiness, Pinellas's anchor tracts are strongly positioned for investment as the high-tech, manufacturing-centric anchor in the Tampa Bay area.</p>
+        </div>
+      </div>
+
+    </div><!-- /slides -->
+
+    <div class="nav">
+      <button class="nav-btn" id="prev" disabled>← Prev</button>
+      <div class="nav-dots">
+        <div class="nav-dot active" data-index="0"></div>
+        <div class="nav-dot" data-index="1"></div>
+        <div class="nav-dot" data-index="2"></div>
+      </div>
+      <button class="nav-btn" id="next">Next →</button>
+    </div>
+
+  </div><!-- /story-panel -->
+</div><!-- /main -->
+
+<div class="note">Click a county tab or use the arrows to explore each story · Click a highlighted county on the map to navigate directly</div>
 
 <script>
 const countyData = {
-  "12033": { 
-    name: "Escambia", 
-    designation: "Most Ready ",
-    title: "Escambia County: Workforce DNA",
-    narrative: "Northwest Florida's relationship with shipbuilding is generational. Escambia County sits at the center of a region where maritime work has shaped labor markets, skill pipelines, and community identity for decades. This cultural habituation matters. When interviewees described the Panhandle's workforce, they didn't talk about training programs or incentive packages first — they talked about people who already understood the work. For Escambia and its neighbors, investment isn't about creating a shipbuilding culture from scratch. It's about activating one that already exists."
-  },
-  "12009": { 
-    name: "Brevard", 
-    designation: "Notably Ready",
-    title: "Brevard County: Conditions Without Commitment",
-    narrative: "Brevard County should be a simple story. The industrial infrastructure is there: deep-water port access, aerospace manufacturing capacity, skilled technical workforce, proximity to defense installations. On paper, the county checks every readiness box. But the community input told a different story. Workers in Brevard identified more with aerospace, not shipbuilding. This isn't a workforce gap, it's an identity gap. Brevard has the conditions for shipbuilding investment, but it lacks the cultural readiness that makes recruitment easy and retention durable."
-  },
-  "12103": { 
-    name: "Pinellas", 
-    designation: "Most Ready ",
-    title: "Pinellas County: Manufacturing Powerhouse",
-    narrative: "In Pinellas, manufacturing and defense drive more economic activity than tourism. Raytheon, Honeywell, and a network of high-tech manufacturers anchor an industrial base that operates largely out of public perception. The county produces microelectronics, medical devices, and defense components. Community interviews confirmed what the data suggested. The county's 2022 Target Employment and Industrial Land Study identified seven industrial clusters, from life sciences to aerospace. Since 2012, Pinellas has maintained a no-net-loss policy on industrial land, a policy almost unheard of in coastal Florida, where residential development pressure typically wins. The county also solved a problem most regions struggle with: cross-county coordination. Pinellas, Hillsborough, and Pasco now function as a single labor market. Three bridges connect them. Workers commute fluidly across county lines."
-  }
+  "12033": { name: "Escambia", index: 0, designation: "Most Ready",  color: "#3A7D2C" },
+  "12009": { name: "Brevard",  index: 1, designation: "Notably Ready", color: "#D4A017" },
+  "12103": { name: "Pinellas", index: 2, designation: "Most Ready",    color: "#3A7D2C" }
 };
 
 const colorMap = {
-  "Most Ready ":   "#3A7D2C",
+  "Most Ready":    "#3A7D2C",
   "Notably Ready": "#D4A017",
   "other":         "#C8C4BA"
 };
 
+// ── Swipe logic ──────────────────────────────────────────────────────────────
+let current = 0;
+const total = 3;
 
-const tooltip = document.getElementById('tooltip');
-function showTip(event, html) {
-  tooltip.innerHTML = html;
-  tooltip.style.opacity = 1;
-  tooltip.style.left = (event.clientX + 16) + 'px';
-  tooltip.style.top  = (event.clientY - 10) + 'px';
+function goTo(idx) {
+  current = Math.max(0, Math.min(total - 1, idx));
+
+  document.querySelectorAll('.slide').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-dot').forEach(el => el.classList.remove('active'));
+
+  document.querySelector(`.slide[data-index="${current}"]`).classList.add('active');
+  document.querySelector(`.tab[data-index="${current}"]`).classList.add('active');
+  document.querySelector(`.nav-dot[data-index="${current}"]`).classList.add('active');
+
+  document.getElementById('prev').disabled = current === 0;
+  document.getElementById('next').disabled = current === total - 1;
+
+  // Highlight corresponding county on map
+  d3.selectAll('.county-path.highlight')
+    .classed('selected', false)
+    .attr('opacity', 1);
+
+  const targetFips = Object.keys(countyData).find(k => countyData[k].index === current);
+  if (targetFips) {
+    d3.selectAll('.county-path.highlight')
+      .filter(d => d.id.toString() === targetFips)
+      .classed('selected', true);
+  }
 }
-function hideTip() { tooltip.style.opacity = 0; }
 
+document.getElementById('prev').addEventListener('click', () => goTo(current - 1));
+document.getElementById('next').addEventListener('click', () => goTo(current + 1));
+document.querySelectorAll('.tab').forEach(btn => {
+  btn.addEventListener('click', () => goTo(+btn.dataset.index));
+});
+document.querySelectorAll('.nav-dot').forEach(dot => {
+  dot.addEventListener('click', () => goTo(+dot.dataset.index));
+});
+
+// ── Map ──────────────────────────────────────────────────────────────────────
 const container = document.getElementById('map');
-const width  = Math.max(container.offsetWidth || 900, 600);
-const height = Math.round(width * 0.58);
+const width  = Math.max(container.offsetWidth || 600, 400);
+const height = Math.round(width * 1.0); // taller ratio since it's a narrower panel
 
 const svg = d3.select('#map').append('svg')
   .attr('viewBox', `0 0 ${width} ${height}`)
   .attr('width', '100%');
 
-// Loading indicator
 const loadingText = svg.append('text')
   .attr('x', width / 2).attr('y', height / 2)
   .attr('text-anchor', 'middle')
@@ -231,11 +400,7 @@ const loadingText = svg.append('text')
   .attr('font-family', 'Barlow, sans-serif')
   .text('Loading map…');
 
-Promise.all([
-  d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json'),
-  d3.json('designated_tracts_slim.geojson')
-]).then(([us, tractGeo]) => {
-
+d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json').then(us => {
   loadingText.remove();
 
   const allCounties = topojson.feature(us, us.objects.counties).features;
@@ -247,30 +412,28 @@ Promise.all([
 
   const g = svg.append('g');
 
-  // ── Layer 1: Florida county fill ────────────────────────────────────────
   florida.forEach(county => {
     const fips = county.id.toString();
     const data = countyData[fips];
     const color = data ? colorMap[data.designation] : colorMap.other;
+    const isHighlight = !!data;
 
     g.append('path')
       .datum(county)
-      .attr('class', data ? 'county-path highlight' : 'county-path')
+      .attr('class', isHighlight ? 'county-path highlight' : 'county-path')
       .attr('d', path)
       .attr('fill', color)
-      .on('mouseenter', function(event) {
-        if (data?.narrative) showTip(event, `<strong>${data.title}</strong>${data.narrative}`);
+      .on('click', function() {
+        if (data) goTo(data.index);
       })
-      .on('mousemove', function(event) {
-        if (data?.narrative) {
-          tooltip.style.left = (event.clientX + 16) + 'px';
-          tooltip.style.top  = (event.clientY - 10) + 'px';
-        }
+      .on('mouseenter', function() {
+        if (data) d3.select(this).attr('opacity', 0.8);
       })
-      .on('mouseleave', hideTip);
+      .on('mouseleave', function() {
+        d3.select(this).attr('opacity', 1);
+      });
   });
 
-  // ── Layer 2: County borders ──────────────────────────────────────────────
   g.append('path')
     .datum(topojson.mesh(us, us.objects.counties, (a, b) =>
       a.id.toString().startsWith('12') && b.id.toString().startsWith('12') && a !== b
@@ -278,73 +441,10 @@ Promise.all([
     .attr('class', 'county-border')
     .attr('d', path);
 
-  // ── Layer 3: OZ tracts (purple dashed fill) ──────────────────────────────
-  const ozFeatures = tractGeo.features.filter(f => f.properties.oz);
-  const ozGroup = g.append('g').attr('id', 'layer-oz');
+  // Initial selection highlight
+  goTo(0);
 
-  ozGroup.selectAll('.oz-tract')
-    .data(ozFeatures)
-    .enter().append('path')
-      .attr('class', 'oz-tract')
-      .attr('d', path)
-      .attr('fill', 'rgba(91, 79, 207, 0.25)')
-      .attr('stroke', '#5B4FCF')
-      .attr('stroke-width', 0.7)
-      .attr('stroke-dasharray', '3,2')
-      .attr('pointer-events', 'none');
-
-  // ── Layer 4: Anchor tracts (red outline) ────────────────────────────────
-  const anchorFeatures = tractGeo.features.filter(f => f.properties.anchor);
-  const anchorGroup = g.append('g').attr('id', 'layer-anchor');
-
-  anchorGroup.selectAll('.anchor-tract')
-    .data(anchorFeatures)
-    .enter().append('path')
-      .attr('class', 'anchor-tract')
-      .attr('d', path)
-      .attr('fill', 'rgba(204, 0, 0, 0.18)')
-      .attr('stroke', '#CC0000')
-      .attr('stroke-width', 1.2)
-      .attr('pointer-events', 'none');
-
-}).catch(err => {
-  loadingText.text('Map data unavailable. Check console for details.');
-  console.error('Map load error:', err);
-  // Still load the base county map if tracts fail
-  d3.json('https://cdn.jsdelivr.net/npm/us-atlas@3/counties-10m.json').then(us => {
-    loadingText.remove();
-    const allCounties = topojson.feature(us, us.objects.counties).features;
-    const florida = allCounties.filter(d => d.id.toString().startsWith('12'));
-    const projection = d3.geoAlbersUsa().fitSize([width, height], { type: 'FeatureCollection', features: florida });
-    const path = d3.geoPath(projection);
-    const g = svg.append('g');
-    florida.forEach(county => {
-      const fips = county.id.toString();
-      const data = countyData[fips];
-      const color = data ? colorMap[data.designation] : colorMap.other;
-      g.append('path').datum(county)
-        .attr('class', data ? 'county-path highlight' : 'county-path')
-        .attr('d', path).attr('fill', color)
-        .on('mouseenter', e => { if (data?.narrative) showTip(e, `<strong>${data.title}</strong>${data.narrative}`); })
-        .on('mousemove', e => { if (data?.narrative) { tooltip.style.left=(e.clientX+16)+'px'; tooltip.style.top=(e.clientY-10)+'px'; }})
-        .on('mouseleave', hideTip);
-    });
-    g.append('path')
-      .datum(topojson.mesh(us, us.objects.counties, (a,b) => a.id.toString().startsWith('12') && b.id.toString().startsWith('12') && a!==b))
-      .attr('class','county-border').attr('d',path);
-  });
-});
-
-// ── Layer toggle ─────────────────────────────────────────────────────────────
-const layerState = { oz: true, anchor: true };
-
-function toggleLayer(which) {
-  layerState[which] = !layerState[which];
-  const group = document.getElementById('layer-' + which);
-  const btn   = document.getElementById('btn-' + which);
-  if (group) group.style.display = layerState[which] ? '' : 'none';
-  if (btn)   btn.classList.toggle('off', !layerState[which]);
-}
+}).catch(err => console.error('Map load error:', err));
 </script>
 </body>
 </html>
